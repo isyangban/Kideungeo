@@ -80,7 +80,12 @@ func parseContent(content string) interface{} {
 		command, ok := SupportedCommands[commandPrefix]
 		if ok {
 			// Parse arguments and add arguments
-			command.SetArguments(strings.Fields(commandRest))
+			argsR := regexp.MustCompile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'")
+			args := argsR.FindAllString(commandRest, len(strings.Fields(commandRest)))
+			for i, arg := range args {
+				args[i] = strings.Trim(arg, "'\"")
+			}
+			command.SetArguments(args)
 			return command
 		} else {
 			return content
