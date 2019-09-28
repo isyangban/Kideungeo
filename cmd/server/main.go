@@ -12,12 +12,13 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	godotenv.Load()
+	DISCORD_BOT_TOKEN := os.Getenv("DISCORD_BOT_TOKEN")
+	if len(DISCORD_BOT_TOKEN) == 0 {
+		log.Fatal("Don't have required env variables")
 	}
 
-	bot := kideungeo.New(os.Getenv("DISCORD_BOT_TOKEN"))
+	bot := kideungeo.New(DISCORD_BOT_TOKEN)
 
 	// Wait here until CTRL-C or other term signal is received.
 	bot.Start()
