@@ -52,11 +52,16 @@ func getCouponNumber(pCtx context.Context) (string, error) {
 	return couponNumber, nil
 }
 
-func (command *HoukaiCommand) HanndleMessageCreate(
+func (command *HoukaiCommand) HandleMessageCreate(
 	bot *KideungeoBot,
 	m *discordgo.MessageCreate,
 ) error {
 	fmt.Println("Houkai Command", *command)
 	handleMessageCreateSubCommand(bot, m, command.arguments[0], command.arguments[1:])
+	return nil
+}
+
+func (command *HoukaiCommand) Handle(bot *KideungeoBot) error {
+	fmt.Println("Handle Houkai")
 	return nil
 }

@@ -47,4 +47,7 @@ var SupportedCommands = map[string]Commander{
 	"도움": &HelpCommand{
 		Command: Command{name: "Help", commandPrefix: "도움", help: "!도움"},
 	},
+	"붕괴": &HoukaiCommand{
+		Command: Command{name: "Houkai", commandPrefix: "붕괴", help: "!붕괴 [args]"},
+	},
 }
