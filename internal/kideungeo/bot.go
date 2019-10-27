@@ -1,21 +1,25 @@
 package kideungeo
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/chromedp/chromedp"
 )
 
 type KideungeoBot struct {
-	SelfName   string
-	AppID      uint64
-	AppName    string
-	Token      string
-	Session    *discordgo.Session
-	BotVersion string
-	BotAuthor  string
+	SelfName      string
+	AppID         uint64
+	AppName       string
+	Token         string
+	Session       *discordgo.Session
+	BotVersion    string
+	BotAuthor     string
+	ChromeContext context.Context
+	close         chan bool
 }
 
 const BotVersion = "0.0.1"
@@ -35,17 +39,33 @@ func (kb *KideungeoBot) Start() error {
 	dg, err := discordgo.New("Bot " + kb.Token)
 	if err != nil {
 		fmt.Println("Error creating Discord session,", err)
-		return nil
+		return err
 	}
 	kb.Session = dg
 	kb.Session.AddHandler(newMessageCreateHandler(kb))
-	dg.Open()
+	err = dg.Open()
+	if err != nil {
+		fmt.Println("Cannot Open WebSocket", err)
+		return err
+	}
 
+	kb.close = make(chan bool)
+	go kb.runChromeContext()
+	// Wait for context inititalized?
 	return nil
 }
 
 func (kb *KideungeoBot) Close() {
 	kb.Session.Close()
+	kb.close <- true
+}
+
+func (kb *KideungeoBot) runChromeContext() {
+	// Open ChromeDP Browser Context And Close When Bot closes
+	ctx, cancel := chromedp.NewContext(context.Background())
+	kb.ChromeContext = ctx
+	<-kb.close
+	cancel()
 }
 
 // This function will be called (due to AddHandler above) every time a new
